@@ -1,0 +1,274 @@
+<!DOCTYPE>
+<html>
+	
+	<head>
+	
+		<meta charset = "utf-8">
+		
+		<style>
+			
+			#wrapper {
+				position: absolute;
+				top: 0%;
+				left: 0%;
+				width: 100%;
+				height: 100%;
+				background: black;
+				overflow: hidden;
+			}
+		
+			#mycanvas {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				width: 0px;
+				height: 0px;
+				margin-top: -260px;
+				margin-left: -510px;
+				border: 5px solid white;				
+			}
+		
+		</style>
+	
+	</head>
+
+	<body>
+		
+		<wrapper id = "wrapper">
+	
+			<canvas id = "mycanvas" width = "0" height = "0"></canvas>
+			
+		</wrapper>
+	
+	</body>
+	
+	<script src = "color%20palletes.js"></script>
+	
+	<script src = "painting%20genre.js"></script>
+	
+	<script>
+		
+		var continuity = false;
+		
+		var timer = new Date();
+		
+		var resolution = 3;
+		
+		var image_width = 842;
+		
+		var image_height = 595;
+		
+		var canvas_width = image_width * resolution;
+		
+		var canvas_height = image_height * resolution;
+		
+		var border_width = 5;
+		
+		document.getElementById("mycanvas").width = canvas_width;
+		
+		document.getElementById("mycanvas").height = canvas_height;
+		
+		document.getElementById("mycanvas").style.width = image_width;
+		
+		document.getElementById("mycanvas").style.height = image_height;
+		
+		document.getElementById("mycanvas").style.marginLeft = (image_width + border_width * 2) / (-2);
+		
+		document.getElementById("mycanvas").style.marginTop = (image_height + border_width * 2) / (-2);
+		
+		var canvas = document.getElementById("mycanvas").getContext("2d");
+		
+		var map = [];
+		
+		for (var j = 0; j < canvas_width; j++) {
+			
+			map.push([]);
+			
+			for (var i = 0; i < canvas_height; i++) {
+				
+				map[j].push({
+					colored: false,
+					color: "",
+				});
+				
+			}
+			
+		}
+		
+		var brush_amount = 10;
+		
+		var brush_speed = 14;
+		
+		var color_set = 17;
+		
+//		var color_set = 5;
+		
+		var AI = color_data_base[color_set];
+		
+		// show colors
+		
+		for (var i = 0; i < AI.length; i++) {
+			
+			console.log(AI[i].color);
+			
+		}
+		
+		// multiply brushes
+		
+		function multiply_brushes (a) {
+					
+			var cst_len = AI.length;
+			
+			for (var i = 0; i < (a - 1); i++) {
+				
+				for (var j = 0; j < cst_len; j++) {
+					
+					let tmp = {};
+					
+					tmp.color = AI[j].color;
+					
+					tmp.positionX = AI[j].positionX;
+					
+					tmp.positionY = AI[j].positionY;
+					
+					AI.push(tmp);
+				
+				}	
+				
+			}
+			
+		}
+		
+		multiply_brushes(brush_amount);
+		
+		// initialize
+		
+		for (var i = 0; i < AI.length; i++) {
+
+			AI[i].positionX = Math.floor(Math.random() * canvas_width);
+			
+			AI[i].positionY = Math.floor(Math.random() * canvas_height);
+					
+			AI[i].goal_x = AI[i].positionX;
+			
+			AI[i].goal_y = AI[i].positionY;
+			
+			AI[i].last_goal_x = AI[i].positionX;
+			
+			AI[i].last_goal_y = AI[i].positionY;
+			
+			AI[i].AI_target = false;
+			
+			AI[i].path = [];
+
+		}
+
+		AI[_chasing_target_].AI_target = true;
+		
+		// engine
+		
+		var draw_count = Math.floor(canvas_width * canvas_height / (AI.length * brush_speed));
+		
+		var used_genres = 5;
+		
+		var gate = Math.ceil(draw_count * (1 - 1 / used_genres));
+		
+		var is_drawing = false;
+		
+		var engine = setInterval(function(){
+			
+			if (is_drawing) {
+				return 0;
+			}
+			
+			is_drawing = true;
+			
+			// painting genre
+			
+			// the genre that comes first will be the most out-standing , the second will be less , etc . . .
+			
+			// texture
+			
+//			classic();
+		
+//			sand();
+		
+//			sand();
+			
+			cloth();
+			
+			cloth();
+			
+//			wool();
+			
+//			glitch(200 , 100 , 200 , 100);
+			
+			// shape
+			
+//			spiral(50 , 2 * resolution , 1 * resolution , 0);
+			
+			circles(35 * resolution , 10 * resolution , 7 * resolution , 3 * resolution);
+			
+			squares(35 * resolution , 10 * resolution , 5 * resolution , 3 * resolution);
+			
+			triangle(35 * resolution , 10 * resolution , 5 * resolution , 3 * resolution);
+			
+//			 last preparation
+			
+			draw_count--;
+			
+			if (draw_count > gate) {
+				
+				is_drawing = false;
+				
+			} else {
+				
+				if (continuity) {
+				
+					draw_count = Math.floor(canvas_width * canvas_height / (AI.length * brush_speed));
+
+					for (var i = 0; i < map.length; i++) {
+
+						for (var j = 0; j < map[i].length; j++) {
+
+							map[i][j].colored = false;
+
+						}
+
+					}
+
+					is_drawing = false;
+					
+				} else {
+					
+					let img_src = document.getElementById("mycanvas").toDataURL("image/png");
+
+					let img = document.createElement("img");
+
+					img.width = image_width;
+
+					img.height = image_height;
+
+					img.src = img_src;
+
+					img.setAttribute("style" , "position: absolute; top: 50%; left: 50%; width: " + image_width + "px; height: " + image_height + "px; margin-top: -" + (image_height / 2) + "px; margin-left: -" + (image_width / 2) + "px;");
+
+					document.getElementById("wrapper").appendChild(img);
+
+					setTimeout(function(){
+						alert("finished drawing !");
+					} , 500);
+
+					var cur_time = new Date();
+				
+					console.log("finished in " + (cur_time - timer) / 1000 + " seconds");
+					
+				}
+				
+			}
+			
+		} , 10);
+	
+	</script>
+
+</html>
